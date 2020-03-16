@@ -28,57 +28,78 @@ def read_csv(csv_file):
         
     return data
 
-def calculate_time_series(population_size=1000, num_infected=1, iterations=10, \
-                          beta=0.3, gamma=0.9):
+def calculate_time_series(population_size=1000, init_infected=1, init_recovered=0, \
+                          iterations=10, beta=0.3, gamma=0.9, delta_time=0.01):
     '''
     :param beta: The parameter controlling how often a susceptible-infected contact 
-          results in a new infection.
+                 results in a new infection.
 
     :param gamma: The rate an infected recovers and moves into the resistant phase.
+
+    :param delta_time: step size used when solving diff eqs. (smaller values result
+                       in greater accuracy)
     '''
 
-    init_susceptible = population_size
-    init_infected = num_infected
-    init_recovered = 0
+    init_susceptible = population_size - init_infected
 
     susceptible = [init_susceptible]
     infected = [init_infected]
     recovered = [init_recovered]
 
     for i in range(iterations):
-        if (susceptible[i] <= 0):
-            susceptible[i] = 0
-        dS_dt = - beta * (susceptible[i] / population_size) * infected[i]
-        dR_dt = gamma * infected[i]
+        dS_dt = - beta * (susceptible[i] / population_size) * infected[i] * delta_time
+        dR_dt = gamma * infected[i] * delta_time
         dI_dt = -dS_dt - dR_dt
-
+        
         susceptible.append(susceptible[i] + dS_dt)
-        infected.append(infected[i] + dI_dt)
         recovered.append(recovered[i] + dR_dt)
+        infected.append(infected[i] + dI_dt)
 
     return (susceptible, infected, recovered)
 
 def plot_data(susceptible, infected, recovered):
     xs = np.arange(len(susceptible))
-    plt.plot()
     plt.plot(xs, susceptible)
     plt.plot(xs, infected)
     plt.plot(xs, recovered)
+    plt.plot(xs, np.sum([susceptible, infected, recovered], axis=0))
     plt.xlabel('# of Days')
     plt.ylabel('# of People')
     plt.title('SIR Model')
-    plt.legend(['Susceptible', 'Infected', 'Recovered'])
+    plt.legend(['Susceptible', 'Infected', 'Recovered', 'Sum'])
     plt.show()
+
+def sum_across_all_locations(data):
+    data = data[1:,4:]
+    data = np.where(data != '', data, 0)
+    data = data.astype(int)
+    data = np.sum(data, axis=0)[:-1]
+    return data
 
 def main():
     print('Reading data...')
-    confirmed_data = read_csv('data/time_series_19-covid-Confirmed.csv')
-    deaths_data = read_csv('data/time_series_19-covid-Deaths.csv')
-    recovered_data = read_csv('data/time_series_19-covid-Recovered.csv')
+    confirmed_data = np.asarray(read_csv('data/time_series_19-covid-Confirmed.csv'))
+    deaths_data = np.asarray(read_csv('data/time_series_19-covid-Deaths.csv'))
+    recovered_data = np.asarray(read_csv('data/time_series_19-covid-Recovered.csv'))
+
+    # ------------------------------------------
+    # Plot parsed data
+    # o1 = sum_across_all_locations(confirmed_data)
+    # o2 = sum_across_all_locations(deaths_data)
+    # o3 = sum_across_all_locations(recovered_data)
+    # plt.plot(o1)
+    # plt.plot(o2)
+    # plt.plot(o3)
+    # plt.legend(['Confirmed', 'Deaths', 'Recovered'])
+    # plt.show()
+    # ------------------------------------------
 
     print('Calculating SIR data...')
-    susceptible, infected, recovered = calculate_time_series(num_infected=100,\
-         beta=4, gamma=0.1, iterations=100)
+    susceptible, infected, recovered = calculate_time_series(init_infected=140000,\
+         beta=4, gamma=0.1, iterations=10000, population_size=7771074926)
+
+    print(susceptible, '\n\n', infected, '\n\n', recovered)
+
     print('Plotting SIR data...')
     plot_data(susceptible, infected, recovered)
 
