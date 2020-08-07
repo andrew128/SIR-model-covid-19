@@ -60,8 +60,6 @@ def main():
     susceptible, infected, recovered = calculate_time_series(init_infected=140000,\
          beta=4, gamma=0.1, iterations=55 * 100, population_size=7771074926)
 
-    print(susceptible, '\n\n', infected, '\n\n', recovered)
-
     print('Plotting SIR data...')
     plot_data(susceptible, infected, recovered)
 
