@@ -15,19 +15,6 @@ Resources:
 - http://www.public.asu.edu/~hnesse/classes/sir.html?Alpha=0.3&Beta=0.9&initialS=10&initialI=1&initialR=0&iters=10
 '''
 
-def read_csv(csv_file):
-    '''
-    Take in CSV file and return 2d matrix. Each row in the matrix
-    represents a row in the CSV file.
-    '''
-    with open(csv_file) as csvfile:
-        readCSV = csv.reader(csvfile, delimiter=',')
-        data = []
-        for row in readCSV:
-            data.append(row)
-        
-    return data
-
 def calculate_time_series(population_size=1000, init_infected=1, init_recovered=0, \
                           iterations=10, beta=0.3, gamma=0.9, delta_time=0.01):
     '''
@@ -75,41 +62,7 @@ def sum_across_all_locations(data):
     data = np.sum(data, axis=0)[:-1]
     return data
 
-def plot_parsed_data(confirmed_data, deaths_data, recovered_data):
-    '''
-    Extract SIR data from parsed data.
-    '''
-    confirmed_sum = sum_across_all_locations(confirmed_data)
-    deaths_sum = sum_across_all_locations(deaths_data)
-    recovered_sum = sum_across_all_locations(recovered_data)
-
-    population_size=7771074926
-    susceptible_pop = population_size - confirmed_sum
-
-    plt.plot(confirmed_sum)
-    plt.plot(deaths_sum)
-    plt.plot(recovered_sum)
-    plt.legend(['Confirmed', 'Deaths', 'Recovered'])
-    plt.show()
-
 def main():
-    print('Reading data...')
-    confirmed_data = np.asarray(read_csv('data/time_series_19-covid-Confirmed.csv'))
-    deaths_data = np.asarray(read_csv('data/time_series_19-covid-Deaths.csv'))
-    recovered_data = np.asarray(read_csv('data/time_series_19-covid-Recovered.csv'))
-
-    # ------------------------------------------
-    # Plot parsed data
-    # confirmed_sum = sum_across_all_locations(confirmed_data)
-    # deaths_sum = sum_across_all_locations(deaths_data)
-    # recovered_sum = sum_across_all_locations(recovered_data)
-    # plt.plot(confirmed_sum)
-    # plt.plot(deaths_sum)
-    # plt.plot(recovered_sum)
-    # plt.legend(['Confirmed', 'Deaths', 'Recovered'])
-    # plt.show()
-    # ------------------------------------------
-
     print('Calculating SIR data...')
     susceptible, infected, recovered = calculate_time_series(init_infected=140000,\
          beta=4, gamma=0.1, iterations=55 * 100, population_size=7771074926)
