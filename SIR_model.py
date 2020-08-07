@@ -55,13 +55,6 @@ def plot_data(susceptible, infected, recovered):
     plt.legend(['Susceptible', 'Infected', 'Recovered', 'Sum'])
     plt.show()
 
-def sum_across_all_locations(data):
-    data = data[1:,4:]
-    data = np.where(data != '', data, 0)
-    data = data.astype(int)
-    data = np.sum(data, axis=0)[:-1]
-    return data
-
 def main():
     print('Calculating SIR data...')
     susceptible, infected, recovered = calculate_time_series(init_infected=140000,\
