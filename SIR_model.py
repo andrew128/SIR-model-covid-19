@@ -12,7 +12,6 @@ Assumptions:
 
 Resources:
 - https://www.maa.org/press/periodicals/loci/joma/the-sir-model-for-spread-of-disease-eulers-method-for-systems
-- http://www.public.asu.edu/~hnesse/classes/sir.html?Alpha=0.3&Beta=0.9&initialS=10&initialI=1&initialR=0&iters=10
 '''
 
 def calculate_time_series(population_size=1000, init_infected=1, init_recovered=0, \
@@ -34,12 +33,12 @@ def calculate_time_series(population_size=1000, init_infected=1, init_recovered=
     recovered = [init_recovered]
 
     for i in range(iterations):
-        dS_dt = - beta * (susceptible[i] / population_size) * infected[i] * delta_time
-        dR_dt = gamma * infected[i] * delta_time
-        dI_dt = -dS_dt - dR_dt
-        susceptible.append(susceptible[i] + dS_dt)
-        recovered.append(recovered[i] + dR_dt)
-        infected.append(infected[i] + dI_dt)
+        dS = - beta * (susceptible[i] / population_size) * infected[i] * delta_time
+        dR = gamma * infected[i] * delta_time
+        dI = -dS - dR
+        susceptible.append(susceptible[i] + dS)
+        recovered.append(recovered[i] + dR)
+        infected.append(infected[i] + dI)
 
     return (susceptible, infected, recovered)
 
